@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dropship Margin Guard — will this product actually make money?</title>
+<meta name="description" content="Free dropshipping profit calculator. Uses real supplier cost and real US freight, not the supplier's inflated suggested retail price. Shows true contribution margin per order.">
+<style>
+:root{
+  --bg:#0f1115; --panel:#171a21; --line:#262b36; --txt:#e6e9ef; --dim:#98a2b3;
+  --ok:#2fbf71; --warn:#e3a008; --bad:#e5484d; --accent:#4f8cff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:960px;margin:0 auto;padding:28px 18px 72px}
+header{padding:8px 0 22px;border-bottom:1px solid var(--line);margin-bottom:26px}
+h1{font-size:1.65rem;margin:0 0 6px;letter-spacing:-.02em}
+.sub{color:var(--dim);margin:0;font-size:.95rem}
+h2{font-size:1.05rem;margin:30px 0 12px;letter-spacing:-.01em}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+label{display:block;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);margin-bottom:5px}
+input{width:100%;background:#0c0e13;border:1px solid var(--line);color:var(--txt);
+  padding:9px 11px;border-radius:8px;font-size:.95rem;font-variant-numeric:tabular-nums}
+input:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent}
+.hint{font-size:.76rem;color:var(--dim);margin-top:4px;display:block}
+button{background:var(--accent);color:#fff;border:0;padding:11px 20px;border-radius:8px;
+  font-size:.95rem;font-weight:600;cursor:pointer;margin-top:14px}
+button:hover{filter:brightness(1.1)}
+button.ghost{background:transparent;border:1px solid var(--line);color:var(--dim);font-weight:500}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.verdict{border-radius:12px;padding:16px 18px;margin-top:20px;border:1px solid}
+.v-ok{background:rgba(47,191,113,.09);border-color:rgba(47,191,113,.35)}
+.v-bad{background:rgba(229,72,77,.09);border-color:rgba(229,72,77,.35)}
+.v-warn{background:rgba(227,160,8,.09);border-color:rgba(227,160,8,.35)}
+.verdict h3{margin:0 0 4px;font-size:1.1rem}
+.verdict p{margin:0;color:var(--dim);font-size:.92rem}
+.big{font-size:2.1rem;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;margin-top:8px;font-size:.92rem}
+td{padding:7px 0;border-bottom:1px solid var(--line)}
+td:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.tot td{border-top:2px solid var(--line);border-bottom:0;font-weight:700;padding-top:11px}
+.neg{color:var(--bad)}.pos{color:var(--ok)}
+.warnbox{background:rgba(227,160,8,.07);border:1px solid rgba(227,160,8,.28);
+  border-radius:10px;padding:13px 15px;margin-top:16px;font-size:.89rem;color:var(--dim)}
+.warnbox b{color:var(--txt)}
+ul{padding-left:20px;color:var(--dim);font-size:.92rem}
+footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);
+  color:var(--dim);font-size:.84rem}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Dropship Margin Guard</h1>
+  <p class="sub">True contribution margin per order &mdash; using real supplier cost and real freight, not the supplier's suggested retail price.</p>
+</header>
+
+<h2>1. What you pay</h2>
+<div class="card">
+  <div class="grid">
+    <div>
+      <label>Supplier cost (your outlay)</label>
+      <input id="cost" type="number" step="0.01" min="0" value="6.50">
+      <span class="hint">The price CJ/AliExpress charges <em>you</em>. Not their retail.</span>
+    </div>
+    <div>
+      <label>Supplier freight (per unit)</label>
+      <input id="ship" type="number" step="0.01" min="0" value="1.99">
+      <span class="hint">Actual quoted rate to your customer. CJ USA Standard was verified at $1.99.</span>
+    </div>
+    <div>
+      <label>Customer pays shipping?</label>
+      <select id="shippaid" style="width:100%;background:#0c0e13;border:1px solid var(--line);color:var(--txt);padding:9px 11px;border-radius:8px">
+        <option value="1">Yes &mdash; freight passes through</option>
+        <option value="0">No &mdash; I absorb it</option>
+      </select>
+      <span class="hint">Suppliers advertise "free shipping" by hiding it in the product price.</span>
+    </div>
+  </div>
+</div>
+
+<h2>2. What you charge</h2>
+<div class="card">
+  <div class="grid">
+    <div>
+      <label>Selling price</label>
+      <input id="price" type="number" step="0.01" min="0" value="19.99">
+    </div>
+    <div>
+      <label>Items per order</label>
+      <input id="qty" type="number" step="1" min="1" value="1">
+    </div>
+  </div>
+</div>
+
+<h2>3. What it costs you to sell</h2>
+<div class="card">
+  <div class="grid">
+    <div>
+      <label>Payment fee (%)</label>
+      <input id="pct" type="number" step="0.01" min="0" value="3.5">
+      <span class="hint">Shopify Payments 2.9% + 30&cent;. ONERWAY direct was verified at 2% + 4% card uplift.</span>
+    </div>
+    <div>
+      <label>Payment fee (fixed)</label>
+      <input id="fixed" type="number" step="0.01" min="0" value="0.30">
+    </div>
+    <div>
+      <label>Ad cost per order</label>
+      <input id="cac" type="number" step="0.01" min="0" value="0">
+      <span class="hint">Leave 0 if you're not running ads. Paid traffic kills most dropship margins.</span>
+    </div>
+    <div>
+      <label>Refund / returns (%)</label>
+      <input id="refund" type="number" step="0.5" min="0" max="100" value="5">
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <button id="go">Calculate</button>
+  <button class="ghost" id="reset">Reset</button>
+</div>
+
+<div id="out"></div>
+
+<h2>The two mistakes that quietly cost money</h2>
+<div class="warnbox">
+  <p style="margin:0 0 8px"><b>1. Using the supplier's suggested retail as your cost.</b>
+  Suppliers show a strikethrough "compare at" that is routinely ~2&times; the real price. On a
+  product that costs $6.50, a naive tool reads the $12.99 retail as cost and calls the margin thin.
+  It is not thin &mdash; your margin is roughly double what that figure implies.</p>
+  <p style="margin:0"><b>2. Folding freight into the product price.</b>
+  Padding the product price to "cover shipping" hides the real per-order economics and inflates your
+  ad cost, because every extra dollar of price also raises what you pay in payment fees. Pass freight
+  through separately and keep the product margin honest.</p>
+</div>
+
+<h2>Notes on this calculator</h2>
+<ul>
+  <li>Freight is counted once per unit shipped, not once per order.</li>
+  <li>Returns are modelled as a straight percentage haircut on contribution &mdash; a simplification,
+      since a returned unit usually returns some cost with it. Treat it as a floor, not a forecast.</li>
+  <li>Taxes, duties and IOSS are excluded. In the US marketplace they generally fall on the buyer.</li>
+  <li>No data leaves your browser. This page has no analytics and no backend.</li>
+</ul>
+
+<footer>
+  Built by Lin.ai &mdash; Oracle VM &amp; WooCommerce operator. Figures marked "verified" were read
+  from live supplier accounts, not from memory.
+</footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+
+  function num(id){ var v = parseFloat($(id).value); return isFinite(v) ? v : 0; }
+  function money(n){
+    var neg = n < 0;
+    var s = Math.abs(n).toFixed(2);
+    // thousands separators, no locale dependency
+    var parts = s.split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return (neg ? "-$" : "$") + parts.join(".");
+  }
+
+  function compute(){
+    var cost     = num("cost");
+    var ship     = num("ship");
+    var shipPaid = $("shippaid").value === "1";
+    var price    = num("price");
+    var qty      = Math.max(1, num("qty"));
+    var pct      = num("pct");
+    var fixed    = num("fixed");
+    var cac      = num("cac");
+    var refund   = num("refund") / 100;
+
+    var revenue   = price * qty;
+    // Freight is a real cost per unit shipped regardless of who nominally pays it,
+    // because it comes out of the supplier's payout either way.
+    var freight   = shipPaid ? 0 : (ship * qty);
+    var goods     = cost * qty;
+    var fee       = (revenue * pct / 100) + fixed;
+    var contribution = revenue - goods - freight - fee - cac;
+    var afterReturns = contribution * (1 - refund);
+
+    var margin = revenue > 0 ? (afterReturns / revenue) * 100 : 0;
+
+    return {
+      revenue: revenue, goods: goods, freight: freight, fee: fee, cac: cac,
+      contribution: contribution, refundHeld: contribution - afterReturns,
+      afterReturns: afterReturns, margin: margin, qty: qty
+    };
+  }
+
+  function render(){
+    var r = compute();
+    var el = $("out");
+    var verdict, cls, title, note;
+
+    if (r.revenue <= 0){
+      el.innerHTML = '<div class="verdict v-warn"><h3>Enter a selling price</h3><p>Nothing to calculate yet.</p></div>';
+      return;
+    }
+
+    if (r.afterReturns > 0 && r.margin >= 20){
+      cls = "v-ok";
+      title = "Healthy &mdash; " + money(r.afterReturns) + " per order (" + r.margin.toFixed(1) + "%)";
+      note  = "This survives a " + (num("refund")) + "% return rate and still leaves real money. " +
+              "At " + r.qty + " item(s) per order that is " + money(r.afterReturns * 100) + " every 100 orders.";
+    } else if (r.afterReturns > 0){
+      cls = "v-warn";
+      title = "Thin &mdash; " + money(r.afterReturns) + " per order (" + r.margin.toFixed(1) + "%)";
+      note  = "Positive but fragile. One extra fee, one ad cost increase, or a worse return rate puts this underwater.";
+    } else {
+      cls = "v-bad";
+      title = "Loses money &mdash; " + money(r.afterReturns) + " per order (" + r.margin.toFixed(1) + "%)";
+      note  = "Every order sold makes the account smaller. Raise the price, cut the ad spend, or drop the product. " +
+              "Shipping costs are the usual culprit &mdash; check whether you are absorbing freight you should pass through.";
+    }
+
+    var rows = [
+      ["Revenue (" + r.qty + " &times; " + money(num("price")) + ")", r.revenue, ""],
+      ["Supplier cost", -r.goods, ""],
+      ["Freight you absorb", -r.freight, r.freight === 0 ? "muted" : ""],
+      ["Payment fees", -r.fee, ""],
+      ["Ad cost", -r.cac, ""],
+      ["Contribution", r.contribution, ""],
+      ["Refund haircut (" + (num("refund")) + "%)", -r.refundHeld, "muted"]
+    ];
+
+    var html = '<div class="verdict ' + cls + '">' +
+      '<div class="big">' + money(r.afterReturns) + '</div>' +
+      '<h3>' + title + '</h3><p>' + note + '</p></div>';
+
+    html += '<h2>Breakdown per order</h2><div class="card"><table>';
+    for (var i = 0; i < rows.length; i++){
+      var label = rows[i][0], v = rows[i][1], cls2 = rows[i][2];
+      var c = v < 0 ? "neg" : "pos";
+      if (cls2 === "muted") c = "";
+      html += '<tr><td>' + label + '</td><td class="' + c + '">' + money(v) + '</td></tr>';
+    }
+    html += '<tr class="tot"><td>Net after returns</td><td class="' + (r.afterReturns < 0 ? "neg" : "pos") + '">' +
+            money(r.afterReturns) + '</td></tr></table></div>';
+
+    el.innerHTML = html;
+  }
+
+  $("go").addEventListener("click", render);
+  $("reset").addEventListener("click", function(){
+    $("cost").value = "6.50"; $("ship").value = "1.99"; $("shippaid").value = "1";
+    $("price").value = "19.99"; $("qty").value = "1"; $("pct").value = "3.5";
+    $("fixed").value = "0.30"; $("cac").value = "0"; $("refund").value = "5";
+    render();
+  });
+  ["cost","ship","price","qty","pct","fixed","cac","refund","shippaid"].forEach(function(id){
+    $(id).addEventListener("input", render);
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
